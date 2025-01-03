@@ -1,7 +1,21 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
 if (isset($_POST['exit'])) {
     header('location: /Index.php');
     exit;
+}
+if (isset($_POST['reg_btn'])) {
+    $f_name = $_POST['f_name'];
+    $l_name = $_POST['l_name'];
+    $reg_email = $_POST['reg_email'];
+    $reg_pwd = $_POST['reg_pwd'];
+
+    // Assure-toi que les champs sont remplis avant d'appeler la fonction de registre
+    if (!empty($f_name) && !empty($l_name) && !empty($reg_email) && !empty($reg_pwd)) {
+        register($f_name, $l_name, $reg_email, $reg_pwd);
+    } else {
+        $msg = "Veuillez remplir tous les champs.";
+    }
 }
 ?>
 
@@ -31,33 +45,33 @@ if (isset($_POST['exit'])) {
 
                 <div class="flex space-x-2">
                     <div class="space-y-2">
-                        <label for="log_email" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Nom</label>
-                        <input type="email" name="log_email" id="log_email" placeholder="votre nom" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
+                        <label for="f_name" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Nom</label>
+                        <input type="text" name="f_name" id="f_name" placeholder="votre nom" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
                         placeholder-[#787878] focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50
                         transition-all duration-300">
                     </div>
                     <div class="space-y-2">
-                        <label for="log_email" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Prenom</label>
-                        <input type="email" name="log_email" id="log_email" placeholder="votre prenom" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
+                        <label for="l_name" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Prenom</label>
+                        <input type="text" name="l_name" id="l_name" placeholder="votre prenom" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
                         placeholder-[#787878] focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50
                         transition-all duration-300">
                     </div>
                 </div>
                 <div class="space-y-2">
-                    <label for="log_email" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Email</label>
-                    <input type="email" name="log_email" id="log_email" placeholder="votre_email@exemple.com" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
+                    <label for="reg_email" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Email</label>
+                    <input type="email" name="reg_email" id="reg_email" placeholder="votre_email@exemple.com" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
                         placeholder-[#787878] focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50
                         transition-all duration-300">
                 </div>
 
                 <div class="space-y-2">
-                    <label for="log_pwd" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Mot de passe</label>
-                    <input type="password" name="log_pwd" id="log_pwd" placeholder="votre mot de passe" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
+                    <label for="reg_pwd" class="block text-[#E7E7E7] text-left text-sm tracking-wide">Mot de passe</label>
+                    <input type="password" name="reg_pwd" id="reg_pwd" placeholder="votre mot de passe" class="w-full px-4 py-2 bg-[#5E5E5E] text-[#E7E7E7] rounded-lg
                         placeholder-[#787878] focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50
                         transition-all duration-300">
                 </div>
 
-                <button type="submit" name="log_btn" class="w-full px-6 py-2 bg-[#787878] text-[#E7E7E7] hover:bg-[#5E5E5E] 
+                <button type="submit" name="reg_btn" class="w-full px-6 py-2 bg-[#787878] text-[#E7E7E7] hover:bg-[#5E5E5E] 
                     rounded-lg transition-all duration-300 ease-in-out tracking-wide
                     shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50">
                     S'inscrire
@@ -67,6 +81,9 @@ if (isset($_POST['exit'])) {
                         <a href="Login.php" class="text-[#787878] hover:text-[#E7E7E7] underline transition-colors duration-300">Connectez-vous</a>
                     </p>
                 </div>
+                <?php if (isset($msg)) : ?>
+                    <?php echo "<script>alert($msg)</script>" ;?>
+                <?php endif; ?>
             </form>
         </div>
     </header>
