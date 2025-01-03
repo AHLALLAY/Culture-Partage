@@ -19,31 +19,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="relative h-screen bg-gradient-to-b from-[#383838] via-[#787878] to-[#5E5E5E]">
+<body class="relative h-screen bg-gradient-to-b from-[#1F2821] via-[#4C7DA4] to-[#191A1F]">
     <div class="absolute top-0 left-0 w-full h-full">
-        <img src="/Asset/Image/hero.jpg" alt="Image De Hero" class="w-full h-full object-cover">
+        <img src="/Asset/Image/people.png" alt="Image De Hero" class="w-full h-full object-cover">
         <!-- Overlay plus sombre pour un meilleur contraste -->
-        <div class="absolute top-0 left-0 w-full h-full bg-[#1C1C1C]/70"></div>
+        <div class="absolute top-0 left-0 w-full h-full bg-[#191A1F]/70"></div>
     </div>
 
     <header class="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center text-center z-10">
-        <h1 class="text-4xl font-semibold mb-6 text-[#E7E7E7]">
+        <h1 class="text-4xl font-semibold mb-6 text-[#FAF9FA]">
             <span class="block text-shadow-lg">Soyez Bienvenus Chez</span>
-            <span class="block text-5xl font-bold tracking-wide text-[#787878]">Culture Partage</span>
+            <span class="block text-5xl font-bold tracking-wide text-[#ECD9B6]">Culture Partage</span>
         </h1>
         
-        <div class="p-8 rounded-xl bg-[#383838]/30">
+        <div class="p-8 rounded-xl bg-[#1F2821]/30">
             <form action="#" method="post" class="space-x-4">
                 <button type="submit" name="log_btn"
-                    class="px-6 py-2 bg-[#E7E7E7] font-bold text-[#5E5E5E] hover:bg-[#5E5E5E] hover:text-[#E7E7E7] 
+                    class="px-6 py-2 bg-[#FAF9FA] font-bold text-[#191A1F] hover:bg-[#10ADE9] hover:text-[#FAF9FA] 
                     rounded-lg transition-all duration-300 ease-in-out 
-                    shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50">
+                    shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#ECD9B6]/50">
                     Connexion
                 </button>
                 <button type="submit" name="reg_btn"
-                    class="px-6 py-2 bg-[#E7E7E7] font-bold text-[#5E5E5E] hover:bg-[#5E5E5E] hover:text-[#E7E7E7] 
+                    class="px-6 py-2 bg-[#FAF9FA] font-bold text-[#191A1F] hover:bg-[#10ADE9] hover:text-[#FAF9FA] 
                     rounded-lg transition-all duration-300 ease-in-out 
-                    shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50">
+                    shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#ECD9B6]/50">
                     Inscription
                 </button>
             </form>
