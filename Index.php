@@ -1,3 +1,14 @@
+<?php
+    if(isset($_POST['log_btn'])){
+        header('location: /Views/Login.php');
+        exit;
+    }
+    if(isset($_POST['reg_btn'])){
+        header('location: /Views/Register.php');
+        exit;
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,13 +34,13 @@
         
         <div class="p-8 rounded-xl bg-[#383838]/30">
             <form action="#" method="post" class="space-x-4">
-                <button type="submit" 
+                <button type="submit" name="log_btn"
                     class="px-6 py-2 bg-[#E7E7E7] font-bold text-[#5E5E5E] hover:bg-[#5E5E5E] hover:text-[#E7E7E7] 
                     rounded-lg transition-all duration-300 ease-in-out 
                     shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50">
                     Connexion
                 </button>
-                <button type="submit" 
+                <button type="submit" name="reg_btn"
                     class="px-6 py-2 bg-[#E7E7E7] font-bold text-[#5E5E5E] hover:bg-[#5E5E5E] hover:text-[#E7E7E7] 
                     rounded-lg transition-all duration-300 ease-in-out 
                     shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#E7E7E7]/50">
