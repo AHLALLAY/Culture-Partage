@@ -1,2 +1,0 @@
-Digramme de classe : https://lucid.app/lucidchart/c2e60036-8521-45e3-8ab2-35e92c630583/edit?viewport_loc=-364%2C-320%2C2609%2C1138%2C0_0&invitationId=inv_67cb015f-cabb-473a-8f5c-0b5c4bbecc39
-Diagramme de cas d'utilisateur : https://lucid.app/lucidchart/167b102d-1e79-47b6-ac4e-7d68c0220f6e/edit?viewport_loc=-273%2C91%2C2784%2C1214%2C0_0&invitationId=inv_4d5f0831-f777-48ca-9d2d-e5dc1805c08a
