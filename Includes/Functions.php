@@ -72,3 +72,30 @@ function logout(){
     session_destroy();
     header('location: login.php');
 }
+
+function get_user_id($email){ //email sera extrait du session;
+    global $con, $msg;
+    try{
+        $stmt = $con->prepare("SELECT id_user FROM users WHERE email = ?");
+        $stmt->bindParam(1, $email, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['id_user'];
+    }catch(PDOException $e){
+        return false;
+    }
+}
+function get_categories(){
+    global $con;
+    try{
+        $stmt = $con->prepare("SELECT * FROM categories");
+        $stmt->bindParam(1 , $category, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $result;
+    }catch(PDOException $e){
+        return false;
+    }
+}
