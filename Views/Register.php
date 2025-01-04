@@ -37,7 +37,7 @@ if (isset($_POST['reg_btn'])) {
 
     <header class="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center text-center z-10">
         <div class="p-8 rounded-xl bg-[#1F2821]/30 w-96">
-            <form method="post" class="space-y-6">
+            <form method="post" class="space-y-6 select-none">
                 <div class="flex justify-between items-center text-[#FAF9FA] mb-6">
                     <h2 class="text-2xl font-semibold tracking-wide">Inscription</h2>
                     <button name="exit" class="text-3xl hover:text-[#4C7DA4] transition-colors duration-300">&times;</button>

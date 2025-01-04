@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/functions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
 
 session_start();
 

@@ -62,7 +62,7 @@ function login($email, $pass){
             session_start();
             $_SESSION['email'] = $email;
             $_SESSION['roles'] = $resultat['roles'];
-            header('location : /Views/Visitor.php');
+            header('location : Visitor.php');
         }
     }
     return false;
