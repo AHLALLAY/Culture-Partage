@@ -17,7 +17,7 @@
 
 <body class="relative h-screen bg-gradient-to-b from-[#1F2821] via-[#4C7DA4] to-[#191A1F]">
     <div class="absolute top-0 left-0 w-full h-full">
-        <img src="/Asset/Image/people.png" alt="Image De Hero" class="w-full h-full object-cover">
+        <img src="/Asset/people.png" alt="Image De Hero" class="w-full h-full object-cover">
         <div class="absolute top-0 left-0 w-full h-full bg-[#191A1F]/70"></div>
     </div>
 
