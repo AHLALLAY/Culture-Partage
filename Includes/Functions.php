@@ -99,3 +99,61 @@ function get_categories(){
         return false;
     }
 }
+
+function get_category_id($category){ // category sera extrait d'un list de choix;
+    global $con;
+    try{
+        $stmt = $con->prepare("SELECT id_category FROM categories WHERE name_category = ?");
+        $stmt->bindParam(1 , $category, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $result['id_category'];
+    }catch(PDOException $e){
+        return false;
+    }
+}
+function update_user_role($id){
+    global $con;
+    $role = 'Author';
+    try{
+        $stmt = $con->prepare("UPDATE users SET roles = ? WHERE id_user = ?");
+        $stmt->bindParam(1, $role, PDO::PARAM_STR);
+        $stmt->bindParam(2, $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return true;
+    }catch(PDOException $e){
+        return false;
+    }
+}
+function add_article($title, $textbox, $statut, $created_at, $updated_at, $id_user, $id_category){
+    global $con;
+    try{
+        $stmt = $con->prepare("INSERT INTO articles(title, textbox, statut, created_at, updated_at, id_user, id_category) 
+                                        VALUES(:title, :textbox, :statut, :created_at, :updated_at, :id_user, :id_category)");
+        $stmt->bindParam(':title' , $title);
+        $stmt->bindParam(':textbxox' , $textbox);
+        $stmt->bindParam(':statut' , $statut);
+        $stmt->bindParam(':created_at' , $created_at);
+        $stmt->bindParam(':updated_at' , $updated_at);
+        $stmt->bindParam(':id_user' , $id_user);
+        $stmt->bindParam(':id_category' , $id_category);
+        $stmt->execute();
+        return true;
+    }catch(PDOException $e){
+        return false;
+    }
+}
+
+function get_article(){
+    global $con;
+    try{
+        $stmt = $con->prepare("SELECT * FROM articles");
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $result;
+    }catch(PDOException $e){
+        return "Articles not founde";
+    }
+}
