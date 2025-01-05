@@ -1,9 +1,30 @@
 <?php
-    if(isset($_POST['exit'])){
-        header('location: /Index.php');
-        exit;
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
+$msg = null;
+
+if (isset($_POST['exit'])) {
+    header('location: /Index.php');
+    exit;
+}
+
+if (isset($_POST['log_btn'])) {
+    $email = $_POST['log_email'];
+    $pass = $_POST['log_pwd'];
+
+    if (!empty($email) && !empty($pass)) {
+        $res = login($email, $pass);
+        if ($res) {
+            header('location: Visitor.php');
+            exit;
+        } else {
+            $msg = "L'email ou le mot de passe est incorrect";
+        }
+    } else {
+        $msg = "Veuillez remplir tous les champs.";   
     }
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -56,6 +77,9 @@
                         <a href="Register.php" class="text-[#4C7DA4] hover:text-[#10ADE9] underline transition-colors duration-300">Inscrivez-vous</a>
                     </p>
                 </div>
+                <?php if (isset($msg)) : ?>
+                    <?php echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>"; ?>
+                <?php endif; ?>
             </form>
         </div>
     </header>

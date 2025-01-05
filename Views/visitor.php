@@ -1,27 +1,20 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
-
-session_start();
+$msg = null;
 
 if (!isset($_SESSION['email'])) {
     header('Location: login.php');
     exit();
+}else{
+    $articles = get_articles();
 }
+
 
 if (isset($_POST['logout'])) {
     logout();
 }
 
-$msg = get_user_id($_SESSION['email']);
 
-echo "<script>alert($msg)</script>";
-
-if (isset($_POST['upgrade'])) {
-
-    update_user_role(get_user_id($_SESSION['email']));
-
-    header('location: author.php');
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -103,36 +96,52 @@ if (isset($_POST['upgrade'])) {
 
         <!-- Contenu principal -->
         <main class="ml-64 p-8 w-full">
-            <section class="bg-[#1F2821]/30 text-[#FAF9FA] border-b-4 border-[#4C7DA4] rounded-lg shadow-xl p-6 backdrop-blur">
-                <header class="mb-6 border-b border-[#4C7DA4] pb-4">
-                    <h2 class="text-2xl font-bold text-[#FAF9FA]">Articles Disponibles</h2>
-                </header>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <article class="bg-[#191A1F] rounded-lg overflow-hidden shadow-lg border border-[#4C7DA4] hover:border-[#FAF9FA] transition-all duration-300 transform hover:-translate-y-1">
-                        <div class="p-6">
-                            <div class="flex items-center space-x-4 mb-4">
-                                <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="path_to_image.jpg" alt="Photo du client">
-                                <div>
-                                    <h3 class="text-[#FAF9FA] font-bold text-lg">Title</h3>
-                                    <h4 class="text-[#ECD9B6]">Author - category</h4>
-                                </div>
-                            </div>
-                            <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
-                                Description courte de l'article...
-                            </p>
-                            <button onclick="openModal()"
-                                class="w-full text-center bg-[#4C7DA4] text-[#FAF9FA] py-2 rounded-lg hover:bg-[#10ADE9] transition-colors duration-300">
-                                Voir l'article
-                            </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <?php if ($articles && count($articles) > 0) : ?>
+        <?php foreach ($articles as $article) : ?>
+            <?php 
+            // Limiter le corps de l'article à 150 caractères
+            $shortBody = strlen($article['art_body']) > 150 ? 
+                        substr($article['art_body'], 0, 150) . '...' : 
+                        $article['art_body'];
+            
+            // Formater la date
+            $date = date('d/m/Y', strtotime($article['created_at']));
+            ?>
+            <article class="bg-[#191A1F] rounded-lg overflow-hidden shadow-lg border border-[#4C7DA4] hover:border-[#FAF9FA] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="p-6">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="/Asset/default-avatar.jpg" alt="Photo de l'auteur">
+                        <div>
+                            <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
+                            <h4 class="text-[#ECD9B6]"><?= htmlspecialchars($article['f_name'] . ' ' . $article['l_name'], ENT_QUOTES) ?> - <?= htmlspecialchars($article['category']) ?></h4>
                         </div>
-                    </article>
+                    </div>
+                    <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
+                        <?= htmlspecialchars($shortBody) ?>
+                    </p>
+                    <button onclick="openModal('<?= htmlspecialchars($article['title'], ENT_QUOTES) ?>', 
+                                             '<?= htmlspecialchars($article['f_name'] . ' ' . $article['l_name'], ENT_QUOTES) ?>', 
+                                             '<?= htmlspecialchars($article['category'], ENT_QUOTES) ?>', 
+                                             '<?= htmlspecialchars($date, ENT_QUOTES) ?>', 
+                                             '<?= htmlspecialchars($article['art_body'], ENT_QUOTES) ?>')"
+                            class="w-full text-center bg-[#4C7DA4] text-[#FAF9FA] py-2 rounded-lg hover:bg-[#10ADE9] transition-colors duration-300">
+                        Voir l'article
+                    </button>
                 </div>
-            </section>
+            </article>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <div class="col-span-3 text-center text-[#ECD9B6]">
+            Aucun article disponible pour le moment.
+        </div>
+    <?php endif; ?>
+</div>
         </main>
     </div>
-
+    <?php if (isset($msg)) : ?>
+        <?php echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>"; ?>
+    <?php endif; ?>
     <script src="../JS/script.js"></script>
 </body>
 

@@ -2,136 +2,126 @@
 
 require_once 'Connect.php';
 
-function execute_query($query, $params){
-    global $con;
+session_start();
+function is_exist($email)
+{
+    global $con, $msg;
     try {
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        if (strpos($query, "SELECT") !== false) {
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $con->prepare("SELECT email FROM users WHERE email = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($res) {
+            $msg = "Email already exists";
+            return "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
         }
-        return true;
-
-    } catch(PDOException $e) {
-        return false;
-    }
-}
-
-
-function is_email_exist($email){
-    global $msg;
-    try {
-        $result = execute_query("SELECT email FROM users WHERE email = ?", [$email]);
-        if ($result) {
-            $msg = "L'email existe déjà.";
-            echo "<script>alert('$msg')</script>";
-            return true;
-        }
-    } catch(PDOException $e) {
-        return false;
-    }
-}
-
-
-function register($f_name, $l_name, $email, $pwd, $role = 'Visitor'){
-    $msg = null;
-    $visiteur = $_SERVER['DOCUMENT_ROOT'] . '/views/visiteur.php';
-    
-    if (!is_email_exist($email)) {
-        try{
-            execute_query("INSERT INTO users(f_name, l_name, email, pwd_hashed, roles) VALUES (?, ?, ?, ?, ?)",
-            [$f_name, $l_name, $email, password_hash($pwd, PASSWORD_DEFAULT), $role]);
-            header('location: ' . $visiteur);
-            $msg = "Inscription réussie";
-            return "<script>alert('$msg')</script>";
-        }catch(PDOException $e){
-            $msg = "Inscription Echoue";
-            return "<script>alert('$msg')</script>";
-        }
-    }
-}
-
-function get_role($email) {
-    try {
-        return execute_query("SELECT roles FROM users WHERE email = ?", [$email]);
     } catch (PDOException $e) {
-        return null;
+        $msg = "Error: " . $e->getMessage();
+        return "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 }
 
-function login($email, $pass){
-    if (is_email_exist($email)) {
-        $resultat = execute_query("SELECT password_hashed, roles FROM users WHERE email = ?", [$email]);
-        if ($resultat && password_verify($pass, $resultat['password_hashed'])) {
-            session_start();
-            $_SESSION['email'] = $email;
-            $_SESSION['roles'] = $resultat['roles'];
-            header('location: Visitor.php');
+function register($f_name, $l_name, $email, $pwd, $roles, $created_at)
+{
+    global $con, $msg;
+    try {
+        // Vérifier si l'email existe déjà avant de procéder à l'insertion
+        if (is_exist($email)) {
+            return "<script>alert('Email already exists');</script>";
         }
+
+        // Préparer la requête d'insertion
+        $stmt = $con->prepare("INSERT INTO users (f_name, l_name, email, pwd_hashed, roles, created_at) 
+                               VALUES (:f_name, :l_name, :email, :pwd_hashed, :roles, :created_at)");
+
+        // Exécuter l'insertion
+        $stmt->execute([
+            ':f_name' => $f_name,
+            ':l_name' => $l_name,
+            ':email' => $email,
+            ':pwd_hashed' => password_hash($pwd, PASSWORD_DEFAULT),
+            ':roles' => $roles,
+            ':created_at' => $created_at
+        ]);
+
+        if ($con->lastInsertId()) {
+            header('location: Login.php');
+            exit;
+        } else {
+            $msg = "Registration failed";
+            return "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+        }
+
+    } catch (PDOException $e) {
+        // En cas d'erreur d'exécution, afficher le message d'erreur
+        $msg = "Error: " . $e->getMessage();
+        return "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
-    return false;
 }
 
-function logout() {
-    session_start();
+function login($email, $pwd) {
+    global $con, $msg;
+
+    try {
+        $stmt = $con->prepare("SELECT email, pwd_hashed, roles FROM users WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($res) {
+            if (password_verify($pwd, $res['pwd_hashed'])) {
+                $_SESSION['email'] = $res['email'];
+                $_SESSION['role'] = $res['roles'];
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } catch (PDOException $e) {
+        $msg = "Error: " . $e->getMessage();
+        return false;
+    }
+}
+
+
+function logout(){
     session_unset();
     session_destroy();
-    header('Location: login.php');
-    exit();
+    header('location: Login.php');
+    exit;
 }
 
-function get_user_id($email) {
-    global $con;
+function upgrade_role($email){
+    global $con, $msg;
+
     try {
-        return execute_query("SELECT id_user FROM users WHERE email = ?", [$email]);
+        if(!empty($email) && !empty($role)){
+            $stmt = $con->prepare("SELECT email, roles FROM users WHERE email = :email");
+            $stmt->execute([':email' => $email]);
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            if($res){
+                $stmt = $con->prepare("UPDATE users SET roles = 'Author' WHERE email = :email");
+                $stmt->execute([':email' => $email]);
+            }    
+        }
     } catch (PDOException $e) {
-        return $e->getMessage();
-    }
-}
-
-function get_categories(){
-    try {
-        return execute_query("SELECT * FROM categories", []);
-    } catch(PDOException $e) {
-        return $e->getMessage();
-    }
-}
-
-
-function get_category_id($category) {
-    try {
-        return execute_query("SELECT cat_id FROM categories WHERE cat_name = ?", [$category]);
-    } catch (PDOException $e) {
-        return $e->getMessage();
-    }
-}
-
-function update_user_role($id, $role = 'Author') {
-    global $con;
-    try {
-        return execute_query("UPDATE users SET roles = ? WHERE users_id = ?", [$role, $id]);
-    } catch (PDOException $e) {
-        error_log("Failed to update user role: " . $e->getMessage());
+        $msg = "Error: " . $e->getMessage();
         return false;
     }
 }
 
-function add_article($title, $textbox, $statut, $created_at, $updated_at, $id_user, $id_category) {
-    global $con;
-    try {
-        $stmt = $con->prepare("INSERT INTO articles (title, textbox, statut, created_at, updated_at, id_user, id_category) 
-                               VALUES (:title, :textbox, :statut, :created_at, :updated_at, :id_user, :id_category)");
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':textbox', $textbox);
-        $stmt->bindParam(':statut', $statut);
-        $stmt->bindParam(':created_at', $created_at);
-        $stmt->bindParam(':updated_at', $updated_at);
-        $stmt->bindParam(':id_user', $id_user);
-        $stmt->bindParam(':id_category', $id_category);
+
+function get_articles(){
+    global $con, $msg;
+
+    try{
+        $stmt = $con->prepare("SELECT articles.*, users.f_name, users.l_name FROM articles JOIN users ON author_id = users_id");
         $stmt->execute();
-        return true;
-    } catch (PDOException $e) {
-        error_log("Failed to add article: " . $e->getMessage());
-        return false;
+        $article = $stmt->fetchAll(PDO::FETCH_ASSOC);            
+    }catch(PDOException $e){
+        $msg = "Error" . $e->getMessage();
+        return "<script>alert('". htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "')</script>";
     }
+    return $article;
 }
