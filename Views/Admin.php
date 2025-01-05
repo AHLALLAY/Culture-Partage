@@ -12,16 +12,6 @@ if (isset($_POST['logout'])) {
     logout();
 }
 
-$msg = get_user_id($_SESSION['email']);
-
-echo "<script>alert($msg)</script>";
-
-if (isset($_POST['upgrade'])) {
-
-    update_user_role(get_user_id($_SESSION['email']));
-
-    header('location: author.php');
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">

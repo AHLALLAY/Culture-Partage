@@ -9,7 +9,7 @@ if (!isset($_SESSION['email'])) {
     $articles = get_articles($_SESSION['email']);
 }
 
-if (isset($_SESSION['articles'])) {
+if (isset($_POST['articles'])) {
     $articles = get_articles();
 }
 
