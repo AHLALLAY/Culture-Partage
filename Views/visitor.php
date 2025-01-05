@@ -10,9 +10,7 @@ if (!isset($_SESSION['email'])) {
 }
 
 if(isset($_POST['upgrade'])){
-    if(upgrade_role($_SESSION['email'])){
-        $msg = "Congratulation you are now un an author.";
-    }
+    upgrade_role($_SESSION['email']);
 }
 
 

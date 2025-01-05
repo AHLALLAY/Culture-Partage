@@ -71,6 +71,7 @@ function login($email, $pwd) {
             if (password_verify($pwd, $res['pwd_hashed'])) {
                 $_SESSION['email'] = $res['email'];
                 $_SESSION['role'] = $res['roles'];
+                var_dump($_SESSION['role']);
                 return true;
             } else {
                 return false;
@@ -117,16 +118,29 @@ function upgrade_role($email){
 }
 
 
-function get_articles(){
+function get_articles($email = null) {
     global $con, $msg;
+    $articles = [];
+    try {
+        if ($email) {
+            $stmt = $con->prepare("SELECT articles.*, users.email FROM articles 
+                                   LEFT JOIN users ON articles.author_id = users.id 
+                                   WHERE users.email = :email");
+            $stmt->bindParam(':email', $email);
+        } else {
+            $stmt = $con->prepare("SELECT articles.*, users.email FROM articles 
+                                   JOIN users ON articles.author_id = users.id");
+        }
 
-    try{
-        $stmt = $con->prepare("SELECT articles.*, users.email FROM articles JOIN users ON author_id = users_id");
         $stmt->execute();
-        $article = $stmt->fetchAll(PDO::FETCH_ASSOC);            
-    }catch(PDOException $e){
-        $msg = "Error" . $e->getMessage();
-        return "<script>alert('". htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "')</script>";
+        $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($articles) && $email) {
+            $msg = "Vous n'avez pas encore d'articles.";
+        }
+
+    } catch (PDOException $e) {
+        $msg = "Erreur lors de la récupération des articles : " . $e->getMessage();
     }
-    return $article;
+
+    return $articles;
 }
