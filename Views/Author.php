@@ -9,6 +9,9 @@ if (!isset($_SESSION['email'])) {
     $articles = get_articles($_SESSION['email']);
 }
 
+if (isset($_SESSION['articles'])) {
+    $articles = get_articles();
+}
 
 if (isset($_POST['logout'])) {
     logout();
@@ -26,7 +29,7 @@ if (isset($_POST['logout'])) {
 
 <body class="min-h-screen relative bg-[#1F2821]">
     <!-- Modal -->
-    <div id="articleModal" class="fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+    <div id="articleModal" class="select-none fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
         <div class="bg-[#191A1F] w-full max-w-2xl rounded-lg shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto border border-[#4C7DA4]">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center space-x-4">
@@ -60,7 +63,7 @@ if (isset($_POST['logout'])) {
             <nav>
                 <div class="space-y-2 border-b border-[#FAF9FA] mb-4">
                     <h1 class="text-[#FAF9FA] text-xl font-bold">Welcome</h1>
-                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars(explode('@',$_SESSION['email'])[0]); ?></span>
+                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars(explode('@', $_SESSION['email'])[0]); ?></span>
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">
@@ -97,13 +100,13 @@ if (isset($_POST['logout'])) {
                                     <?= htmlspecialchars($shortBody) ?>
                                 </p>
                                 <button
-                                    onclick='showArticle(<?= json_encode([
-                                                                "title" => $article['title'],
-                                                                "author" => explode('@', $article['email'])[0],
-                                                                "category" => $article['category'],
-                                                                "date" => $date,
-                                                                "body" => $article['art_body']
-                                                            ]) ?>)'
+                                    onclick="showArticle(<?= json_encode([
+                                                                'title' => $article['title'],
+                                                                'author' => explode('@', $article['email'])[0],
+                                                                'category' => $article['category'],
+                                                                'date' => $date,
+                                                                'body' => $article['art_body']
+                                                            ]) ?>)"
                                     class="w-full text-center bg-[#4C7DA4] text-[#FAF9FA] py-2 rounded-lg hover:bg-[#10ADE9] transition-colors duration-300">
                                     Voir l'article
                                 </button>
@@ -122,7 +125,33 @@ if (isset($_POST['logout'])) {
     <?php if (isset($msg)) : ?>
         <?php echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>"; ?>
     <?php endif; ?>
-    <script src="../JS/script.js"></script>
+    <!-- <script src="../JS/script.js"></script> -->
+    <script>
+        function showArticle(article) {
+            document.getElementById('modalTitle').textContent = article.title;
+            document.getElementById('modalAuthor').textContent = article.author;
+            document.getElementById('modalCategory').textContent = article.category;
+            document.getElementById('modalDate').textContent = article.date;
+            document.getElementById('modalDescription').textContent = article.body;
+            document.getElementById('articleModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+        }
+
+        // Fermer la modale si on clique en dehors
+        document.getElementById('articleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Empêcher la fermeture quand on clique sur le contenu de la modale
+        document.querySelector('#articleModal > div').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
 </body>
 
 </html>

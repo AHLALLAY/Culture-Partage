@@ -124,11 +124,11 @@ function get_articles($email = null) {
         if ($email) {
             $stmt = $con->prepare("SELECT articles.*, users.email FROM articles 
                                    LEFT JOIN users ON articles.author_id = users.users_id 
-                                   WHERE users.email = :email");
+                                   WHERE users.email = :email ORDER BY articles.created_at DESC");
             $stmt->bindParam(':email', $email);
         } else {
             $stmt = $con->prepare("SELECT articles.*, users.email FROM articles 
-                                   JOIN users ON articles.author_id = users.users_id");
+                                   JOIN users ON articles.author_id = users.users_id ORDER BY articles.created_at DESC");
         }
 
         $stmt->execute();

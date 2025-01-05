@@ -82,7 +82,7 @@ if (isset($_POST['logout'])) {
                     <?php foreach ($articles as $article) : ?>
                         <?php
                         $shortBody = strlen($article['art_body']) > 150 ?
-                            substr($article['art_body'], 0, 150) . '...' :
+                            substr($article['art_body'], 0, 150) . ' ...' :
                             $article['art_body'];
                         $date = date('d/m/Y', strtotime($article['created_at']));
                         ?>
@@ -93,20 +93,20 @@ if (isset($_POST['logout'])) {
                                     <div>
                                         <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
                                         <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4>
-                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['category']) ?></span>
+                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['category']) ?></span><span class="text-sm text-[#ECD9B6]"> <?= htmlspecialchars($article['created_at']) ?></span>
                                     </div>
                                 </div>
                                 <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
                                     <?= htmlspecialchars($shortBody) ?>
                                 </p>
                                 <button
-                                    onclick='showArticle(<?= json_encode([
-                                                                "title" => $article['title'],
-                                                                "author" => explode('@', $article['email'])[0],
-                                                                "category" => $article['category'],
-                                                                "date" => $date,
-                                                                "body" => $article['art_body']
-                                                            ]) ?>)'
+                                    onclick="showArticle(<?= json_encode([
+                                                                'title' => $article['title'],
+                                                                'author' => explode('@', $article['email'])[0],
+                                                                'category' => $article['category'],
+                                                                'date' => $date,
+                                                                'body' => $article['art_body']
+                                                            ]) ?>)"
                                     class="w-full text-center bg-[#4C7DA4] text-[#FAF9FA] py-2 rounded-lg hover:bg-[#10ADE9] transition-colors duration-300">
                                     Voir l'article
                                 </button>
