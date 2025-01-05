@@ -96,18 +96,23 @@ function upgrade_role($email){
     global $con, $msg;
 
     try {
-        if(!empty($email) && !empty($role)){
+        if(!empty($email)){
             $stmt = $con->prepare("SELECT email, roles FROM users WHERE email = :email");
             $stmt->execute([':email' => $email]);
             $res = $stmt->fetch(PDO::FETCH_ASSOC);
             if($res){
-                $stmt = $con->prepare("UPDATE users SET roles = 'Author' WHERE email = :email");
-                $stmt->execute([':email' => $email]);
+                try{
+                    $stmt = $con->prepare("UPDATE users SET roles = 'Author' WHERE email = :email");
+                    $stmt->execute([':email' => $email]);
+                    header('location: Author.php');
+                    exit;
+                }catch(PDOException $e){
+                    return $e->getMessage();
+                }
             }    
         }
     } catch (PDOException $e) {
-        $msg = "Error: " . $e->getMessage();
-        return false;
+        return $e->getMessage();
     }
 }
 
@@ -116,7 +121,7 @@ function get_articles(){
     global $con, $msg;
 
     try{
-        $stmt = $con->prepare("SELECT articles.*, users.f_name, users.l_name FROM articles JOIN users ON author_id = users_id");
+        $stmt = $con->prepare("SELECT articles.*, users.email FROM articles JOIN users ON author_id = users_id");
         $stmt->execute();
         $article = $stmt->fetchAll(PDO::FETCH_ASSOC);            
     }catch(PDOException $e){
