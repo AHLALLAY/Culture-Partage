@@ -6,11 +6,7 @@ if (!isset($_SESSION['email'])) {
     header('Location: login.php');
     exit();
 } else {
-    $articles = get_articles();
-}
-
-if(isset($_POST['upgrade'])){
-    upgrade_role($_SESSION['email']);
+    $articles = get_articles($_SESSION['email']);
 }
 
 
@@ -64,12 +60,12 @@ if (isset($_POST['logout'])) {
             <nav>
                 <div class="space-y-2 border-b border-[#FAF9FA] mb-4">
                     <h1 class="text-[#FAF9FA] text-xl font-bold">Welcome</h1>
-                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars($_SESSION['email']); ?></span>
+                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars(explode('@',$_SESSION['email'])[0]); ?></span>
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">
                         <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
-                        <button name="upgrade" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Display All</button>
+                        <button name="articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Display All</button>
                         <button name="new" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Add Article</button>
                     </div>
                 </form>

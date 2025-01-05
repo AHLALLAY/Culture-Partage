@@ -64,7 +64,7 @@ if (isset($_POST['logout'])) {
             <nav>
                 <div class="space-y-2 border-b border-[#FAF9FA] mb-4">
                     <h1 class="text-[#FAF9FA] text-xl font-bold">Welcome</h1>
-                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars($_SESSION['email']); ?></span>
+                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars(explode('@', $_SESSION['email'])[0]); ?></span>
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">

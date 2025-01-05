@@ -71,8 +71,7 @@ function login($email, $pwd) {
             if (password_verify($pwd, $res['pwd_hashed'])) {
                 $_SESSION['email'] = $res['email'];
                 $_SESSION['role'] = $res['roles'];
-                var_dump($_SESSION['role']);
-                return true;
+                return header('location:'. $res['roles'] .'.php');
             } else {
                 return false;
             }
