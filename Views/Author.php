@@ -9,8 +9,11 @@ if (!isset($_SESSION['email'])) {
     $articles = get_articles($_SESSION['email']);
 }
 
-if (isset($_POST['articles'])) {
+if (isset($_POST['all_articles'])) {
     $articles = get_articles();
+}
+if(isset($_POST['my_articles'])){
+    $articles = get_articles($_SESSION['email']);
 }
 
 if (isset($_POST['logout'])) {
@@ -68,7 +71,8 @@ if (isset($_POST['logout'])) {
                 <form method="post" class="select-none">
                     <div class="space-y-2">
                         <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
-                        <button name="articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Display All</button>
+                        <button name="all_articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Display All</button>
+                        <button name="my_articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Add Article</button>
                         <button name="new" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Add Article</button>
                     </div>
                 </form>
