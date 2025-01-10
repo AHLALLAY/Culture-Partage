@@ -23,15 +23,12 @@ if (isset($_POST['Add_category'])) {
         // Traitement de l'ajout de la catégorie
         $result = new_category($_POST['categoryName']);
         if ($result) {
-            echo json_encode(['success' => true]);
-            exit();
+            echo "<script>alert('le catégorie a été ajouter')</script>";
         } else {
-            echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'ajout de la catégorie.']);
-            exit();
+            echo "<script>alert('erreur lors l''ajouter de la catégorie')</script>";
         }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Le champ de catégorie est vide.']);
-        exit();
+        echo "<script>alert('Le champ de catégorie est vide.')</script>";
     }
 }
 

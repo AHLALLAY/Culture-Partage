@@ -61,6 +61,7 @@ function register($f_name, $l_name, $pic, $email, $pwd, $roles, $created_at, $is
         return false;
     }
 }
+
 function is_suspend($email){
     global $con;
     try {
@@ -106,8 +107,6 @@ function login($email, $pwd){
     }
 }
 
-
-
 function logout(){
     session_unset();
     session_destroy();
@@ -138,7 +137,6 @@ function upgrade_role($email){
         return $e->getMessage();
     }
 }
-
 
 function get_articles($email = null){
     global $con, $msg;
@@ -251,7 +249,7 @@ function new_category($category) {
         $stmt->execute();
         return true;
     } catch (PDOException $e) {
-        return $e->getMessage();
+        return "Erreur PDO: " . $e->getMessage();
     }
 }
 
