@@ -3,6 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
 
 $users = get_users();
 $category = get_category();
+$articles = get_articles();
 
 if (!isset($_SESSION['email'])) {
     header('Location: login.php');
@@ -20,15 +21,26 @@ if (isset($_POST['suspend']) && isset($_POST['id'])) {
 
 if (isset($_POST['Add_category'])) {
     if (!empty($_POST['categoryName'])) {
-        // Traitement de l'ajout de la catégorie
         $result = new_category($_POST['categoryName']);
+        header('Content-Type: application/json');
         if ($result) {
-            echo "<script>alert('le catégorie a été ajouter')</script>";
+            echo json_encode([
+                'success' => true,
+                'message' => 'La catégorie a été ajoutée'
+            ]);
         } else {
-            echo "<script>alert('erreur lors l''ajouter de la catégorie')</script>";
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erreur lors de l\'ajout de la catégorie'
+            ]);
         }
+        exit;
     } else {
-        echo "<script>alert('Le champ de catégorie est vide.')</script>";
+        echo json_encode([
+            'success' => false,
+            'message' => 'Le champ de catégorie est vide'
+        ]);
+        exit;
     }
 }
 
@@ -52,6 +64,8 @@ if (isset($_POST['Add_article'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <title>DashBoard Admin</title>
 </head>
 
@@ -153,7 +167,8 @@ if (isset($_POST['Add_article'])) {
                 </div>
                 <form method="post">
                     <div class="space-y-2">
-                        <button type="submit" name="display_users" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Display users</button>
+                        <button type="button" id="display_users" name="display_users" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Display users</button>
+                        <button type="button" id="display_article" name="display_article" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Display Article</button>
                         <button type="button" id="New_article" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Add article</button>
                         <button type="button" id="New_category" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Add Category</button>
                         <button type="submit" name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-52">Logout</button>
@@ -163,10 +178,10 @@ if (isset($_POST['Add_article'])) {
         </aside>
 
         <main class="ml-64 p-8 w-full select-none">
-            <section class="bg-[#1F2821]/30 text-[#FAF9FA] border-b-4 border-[#4C7DA4] rounded-lg shadow-xl p-6 backdrop-blur">
+            <section id="users" class="bg-[#1F2821]/30 text-[#FAF9FA] border-b-4 border-[#4C7DA4] rounded-lg shadow-xl p-6 backdrop-blur">
                 <header class="mb-6 border-b border-[#4C7DA4] pb-4">
                     <h2 class="text-2xl font-bold text-[#FAF9FA]">Users</h2>
-                    <!-- <span class="text-white"><?= "<script>alert('$msg')</script>" ?></span> -->
+                    <span class="text-white"><?= "<script>alert('$msg')</script>" ?></span>
                 </header>
 
                 <div class="overflow-x-auto relative shadow-md rounded-lg border border-[#4C7DA4]">
@@ -247,43 +262,62 @@ if (isset($_POST['Add_article'])) {
                     </table>
                 </div>
             </section>
+
+            <section id="articles" class="hidden bg-[#1F2821]/30 text-[#FAF9FA] border-b-4 border-[#4C7DA4] rounded-lg shadow-xl p-6 backdrop-blur">
+                <header class="mb-6 border-b border-[#4C7DA4] pb-4">
+                    <h2 class="text-2xl font-bold text-[#FAF9FA]">Articles</h2>
+                    <span class="text-white"><?= "<script>alert('$msg')</script>" ?></span>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <?php if ($articles && count($articles) > 0) : ?>
+                        <?php foreach ($articles as $article) : ?>
+                            <?php
+                            $shortBody = strlen($article['art_body']) > 150 ?
+                                substr($article['art_body'], 0, 150) . '...' :
+                                $article['art_body'];
+                            $date = date('d/m/Y', strtotime($article['created_at']));
+                            ?>
+                            <article class="select-none bg-[#191A1F] rounded-lg overflow-hidden shadow-lg border border-[#4C7DA4] hover:border-[#FAF9FA] transition-all duration-300 transform hover:-translate-y-1">
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="data:image/*;base64,<?= base64_encode($user['images']) ?>" alt="<?= htmlspecialchars(explode('@', $article['email'])[0]) ?>'s profile">
+                                        <div>
+                                            <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
+                                            <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4>
+                                            <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat']) ?></span>
+                                        </div>
+                                    </div>
+                                    <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
+                                        <?= htmlspecialchars($shortBody) ?>
+                                    </p>
+                                    <button
+                                        onclick="showArticle(<?= json_encode([
+                                                                    'title' => $article['title'],
+                                                                    'author' => explode('@', $article['email'])[0],
+                                                                    'category' => $article['cat'],
+                                                                    'date' => $date,
+                                                                    'body' => $article['art_body']
+                                                                ]) ?>)"
+                                        class="w-full text-center bg-[#4C7DA4] text-[#FAF9FA] py-2 rounded-lg hover:bg-[#10ADE9] transition-colors duration-300">
+                                        Voir l'article
+                                    </button>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <div class="col-span-3 text-center text-[#ECD9B6]">
+                            Aucun article disponible pour le moment.
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+
         </main>
     </div>
 
     <script src="/Js/Script.js"></script>
-    <!-- <script src="/Js/Ajax.js"></script> -->
+    <script src="/Js/Ajax.js"></script>
 
-    <script>
-        const category = document.getElementById('addCategoryForm');
-        category.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(category);
-
-            fetch('', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Réponse réseau non OK');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        alert('Category ajouté avec succès !');
-                        document.getElementById("categoryModal").classList.add("hidden");
-                    } else {
-                        alert('Erreur lors de l\'ajout de la catégorie: ' + (data.message || ''));
-                    }
-                })
-                .catch((error) => {
-                    console.error('Erreur:', error);
-                    alert('Une erreur est survenue.');
-                });
-        });
-    </script>
 
 </body>
 

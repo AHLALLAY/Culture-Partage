@@ -51,3 +51,13 @@ function openModal(id){
 function closeModal(id){
     document.getElementById(id).classList.add('hidden')
 }
+
+document.getElementById('display_users').addEventListener('click', () => {
+    document.getElementById('users').classList.remove('hidden');
+    document.getElementById('articles').classList.add('hidden');
+});
+
+document.getElementById('display_article').addEventListener('click', () => {
+    document.getElementById('users').classList.add('hidden');
+    document.getElementById('articles').classList.remove('hidden');
+});
