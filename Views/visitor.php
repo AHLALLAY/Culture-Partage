@@ -2,11 +2,15 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
 $msg = null;
 
+
+
 if (!isset($_SESSION['email'])) {
     header('Location: login.php');
     exit();
-} else {
-    $articles = get_articles();
+}
+if(strtolower($_SESSION['role']) == 'visitor') {
+    header('Location:'.$_SESSION['role'] .'.php');
+    // exit;
 }
 
 if(isset($_POST['upgrade'])){
@@ -17,6 +21,8 @@ if(isset($_POST['upgrade'])){
 if (isset($_POST['logout'])) {
     logout();
 }
+
+$articles = get_articles();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -68,7 +74,7 @@ if (isset($_POST['logout'])) {
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">
-                        <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
+                        <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
                         <button name="upgrade" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Upgrade</button>
                     </div>
                 </form>
@@ -89,11 +95,11 @@ if (isset($_POST['logout'])) {
                         <article class="select-none bg-[#191A1F] rounded-lg overflow-hidden shadow-lg border border-[#4C7DA4] hover:border-[#FAF9FA] transition-all duration-300 transform hover:-translate-y-1">
                             <div class="p-6">
                                 <div class="flex items-center space-x-4 mb-4">
-                                    <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="/Asset/default-avatar.jpg" alt="Photo de l'auteur">
+                                    <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="<?= 'data:image/jpeg;base64,' .base64_encode($article['images']) ?>" alt="Photo de l'auteur">
                                     <div>
                                         <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
                                         <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4>
-                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['category']) ?></span><span class="text-sm text-[#ECD9B6]"> <?= htmlspecialchars($article['created_at']) ?></span>
+                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat_id']) ?></span><span class="text-sm text-[#ECD9B6]"> <?= htmlspecialchars($article['created_at']) ?></span>
                                     </div>
                                 </div>
                                 <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
@@ -103,7 +109,7 @@ if (isset($_POST['logout'])) {
                                     onclick="showArticle(<?= json_encode([
                                                                 'title' => $article['title'],
                                                                 'author' => explode('@', $article['email'])[0],
-                                                                'category' => $article['category'],
+                                                                'category' => $article['cat_id'],
                                                                 'date' => $date,
                                                                 'body' => $article['art_body']
                                                             ]) ?>)"
@@ -125,7 +131,7 @@ if (isset($_POST['logout'])) {
     <?php if (isset($msg)) : ?>
         <?php echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>"; ?>
     <?php endif; ?>
-    <script src="../JS/script.js"></script>
+    <script src="../Js/Script.js"></script>
 </body>
 
 </html>

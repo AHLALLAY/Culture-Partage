@@ -6,33 +6,72 @@ if (isset($_POST['exit'])) {
     exit;
 }
 
+// if (isset($_POST['reg_btn'])) {
+//     $f_name = $_POST['f_name'];
+//     $l_name = $_POST['l_name'];
+//     $pic = addslashes(file_get_contents($_FILES['photo']['tmp_name']));
+//     $reg_email = $_POST['reg_email'];
+//     $reg_pwd = $_POST['reg_pwd'];
+
+//     $roles = 'Visitor';
+//     $created_at = (new DateTime())->format('Y-m-d H:i:s');
+
+//     if (!empty($f_name) && !empty($l_name) && !empty($img) && !empty($reg_email) && !empty($reg_pwd)) {
+//         if (strlen($reg_pwd) >= 8) {
+//             $result = register($f_name, $l_name, $pic, $reg_email, $reg_pwd, $roles, $created_at);
+//             if ($result) {
+//                 $msg = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+//             } else {
+//                 $msg = "L'email est déjà utilisé ou une erreur est survenue.";
+//             }
+//         } else {
+//             $msg = "Le mot de passe doit contenir au moins 8 caractères.";
+//         }
+//     } else {
+//         $msg = "Veuillez remplir tous les champs.";
+//     }
+// }
+
 if (isset($_POST['reg_btn'])) {
-    $f_name = $_POST['f_name'];
-    $l_name = $_POST['l_name'];
-    $reg_email = $_POST['reg_email'];
-    $reg_pwd = $_POST['reg_pwd'];
+    // Vérifier si un fichier a été téléchargé
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['image']['tmp_name'];  // Chemin temporaire du fichier téléchargé
+        $fileName = $_FILES['image']['name'];         // Nom du fichier téléchargé
+        $fileSize = $_FILES['image']['size'];         // Taille du fichier
+        $fileType = $_FILES['image']['type'];         // Type du fichier
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)); // Extension du fichier
 
-    $roles = 'Visitor';
-    $created_at = (new DateTime())->format('Y-m-d H:i:s');
+        // Dossier de destination (Asset/ dans votre projet)
+        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/Asset/';
+        
+        // Vérifier si le dossier existe, sinon le créer
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true); // Créer le dossier si nécessaire
+        }
 
-    if (!empty($f_name) && !empty($l_name) && !empty($reg_email) && !empty($reg_pwd)) {
-        if (strlen($reg_pwd) >= 8) {
-            $result = register($f_name, $l_name, $reg_email, $reg_pwd, $roles, $created_at);
-            if ($result) {
-                $msg = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
-                
-                // echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+        // Chemin complet du fichier de destination
+        $destinationPath = $targetDir . basename($fileName);
+
+        // Vérifier si le fichier est une image
+        if (getimagesize($fileTmpPath) !== false) {
+            // Déplacer le fichier téléchargé vers le dossier Asset
+            if (move_uploaded_file($fileTmpPath, $destinationPath)) {
+                // Enregistrer le chemin dans la base de données
+                $imagePath = '/Asset/' . basename($fileName);  // Chemin relatif à partir de la racine du projet
+
+                // Enregistrez le chemin de l'image dans la base de données
+                $stmt = $con->prepare("INSERT INTO images (image_path) VALUES (:image_path)");
+                $stmt->execute([':image_path' => $imagePath]);
+
+                echo "L'image a été téléchargée avec succès et enregistrée dans la base de données.";
             } else {
-                $msg = "L'email est déjà utilisé ou une erreur est survenue.";
-                // echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+                echo "Une erreur est survenue lors du déplacement de l'image.";
             }
         } else {
-            $msg = "Le mot de passe doit contenir au moins 8 caractères.";
-            // echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+            echo "Le fichier téléchargé n'est pas une image valide.";
         }
     } else {
-        $msg = "Veuillez remplir tous les champs.";
-        // echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+        echo "Aucun fichier n'a été téléchargé ou une erreur est survenue.";
     }
 }
 ?>
@@ -78,6 +117,15 @@ if (isset($_POST['reg_btn'])) {
                             transition-all duration-300">
                     </div>
                 </div>
+
+                <div class="space-y-2">
+                    <label for="photo" class="block text-[#FAF9FA] text-left text-sm tracking-wide">Photo</label>
+                    <input type="file" name="photo" id="photo" placeholder="votre photo"
+                        class="w-full px-4 py-2 bg-[#191A1F] text-[#FAF9FA] rounded-lg
+                        placeholder-[#4C7DA4] focus:outline-none focus:ring-2 focus:ring-[#ECD9B6]/50
+                        transition-all duration-300">
+                </div>
+
                 <div class="space-y-2">
                     <label for="reg_email" class="block text-[#FAF9FA] text-left text-sm tracking-wide">Email</label>
                     <input type="email" name="reg_email" id="reg_email" placeholder="votre_email@exemple.com"

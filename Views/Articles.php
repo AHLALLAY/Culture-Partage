@@ -6,15 +6,13 @@ if (!isset($_SESSION['email'])) {
     header('Location: login.php');
     exit();
 } else {
-    $articles = get_articles($_SESSION['email']);
-}
-
-if (isset($_POST['all_articles'])) {
     $articles = get_articles();
 }
-if (isset($_POST['my_articles'])) {
-    $articles = get_articles($_SESSION['email']);
+
+if(isset($_POST['upgrade'])){
+    upgrade_role($_SESSION['email']);
 }
+
 
 if (isset($_POST['logout'])) {
     logout();
@@ -32,7 +30,7 @@ if (isset($_POST['logout'])) {
 
 <body class="min-h-screen relative bg-[#1F2821]">
     <!-- Modal -->
-    <div id="articleModal" class="select-none fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+    <div id="articleModal" class="fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
         <div class="bg-[#191A1F] w-full max-w-2xl rounded-lg shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto border border-[#4C7DA4]">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center space-x-4">
@@ -66,14 +64,12 @@ if (isset($_POST['logout'])) {
             <nav>
                 <div class="space-y-2 border-b border-[#FAF9FA] mb-4">
                     <h1 class="text-[#FAF9FA] text-xl font-bold">Welcome</h1>
-                    <span class="text-[#ECD9B6]"><?php echo htmlspecialchars(explode('@', $_SESSION['email'])[0]); ?></span>
+                    <span class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $_SESSION['email'])[0]); ?></span>
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">
                         <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
-                        <button name="all_articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Display All</button>
-                        <button name="my_articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">My Article</button>
-                        <button name="new" id="new" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Add Article</button>
+                        <button name="upgrade" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Upgrade</button>
                     </div>
                 </form>
             </nav>
@@ -86,18 +82,18 @@ if (isset($_POST['logout'])) {
                     <?php foreach ($articles as $article) : ?>
                         <?php
                         $shortBody = strlen($article['art_body']) > 150 ?
-                            substr($article['art_body'], 0, 150) . '...' :
+                            substr($article['art_body'], 0, 150) . ' ...' :
                             $article['art_body'];
                         $date = date('d/m/Y', strtotime($article['created_at']));
                         ?>
                         <article class="select-none bg-[#191A1F] rounded-lg overflow-hidden shadow-lg border border-[#4C7DA4] hover:border-[#FAF9FA] transition-all duration-300 transform hover:-translate-y-1">
                             <div class="p-6">
                                 <div class="flex items-center space-x-4 mb-4">
-                                    <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="/Asset/default-avatar.jpg" alt="Photo de l'auteur">
+                                    <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="<?= 'data:image/jpeg;base64,' .base64_encode($article['images']) ?>" alt="Photo de l'auteur">
                                     <div>
                                         <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
                                         <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4>
-                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat_id']) ?></span>
+                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat_id']) ?></span><span class="text-sm text-[#ECD9B6]"> <?= htmlspecialchars($article['created_at']) ?></span>
                                     </div>
                                 </div>
                                 <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
@@ -129,60 +125,7 @@ if (isset($_POST['logout'])) {
     <?php if (isset($msg)) : ?>
         <?php echo "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>"; ?>
     <?php endif; ?>
-
-    <!-- Modal d'ajoute-->
-<div id="addArticle" class="select-none fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-[#191A1F] w-full max-w-2xl rounded-lg shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto border border-[#4C7DA4]">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center space-x-4">
-                    <div class="block space-y-">
-                        <label for="title">Title</label>
-                        <input type="text" id="title" name="title" placeholder="Titre d'article">
-                    </div>
-                    <div class="space-y-2">
-                        <h2 id="modalTitle" class="text-xl font-bold text-[#FAF9FA]"></h2> <!-- titre -->
-                        <div class="text-[#ECD9B6] text-sm">
-                            <span id="modalAuthor"></span> - <span id="modalCategory"></span> <!-- nom & prenom -->
-                            <div id="modalDate" class="mt-1"></div> <!-- date -->
-                        </div>
-                    </div>
-                </div>
-                <button onclick="closeModal()" class="text-[#ECD9B6] hover:text-[#FAF9FA] text-xl font-bold">&times;</button> <!-- fermer -->
-            </div>
-            <div class="border-t border-[#4C7DA4] py-4">
-                <div class="prose prose-invert">
-                    <div id="modalDescription" class="text-[#ECD9B6] whitespace-pre-wrap"></div> <!-- article -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- <script src="../JS/script.js"></script> -->
-    <script>
-        function showArticle(article) {
-            document.getElementById('modalTitle').textContent = article.title;
-            document.getElementById('modalAuthor').textContent = article.author;
-            document.getElementById('modalCategory').textContent = article.category;
-            document.getElementById('modalDate').textContent = article.date;
-            document.getElementById('modalDescription').textContent = article.body;
-            document.getElementById('articleModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('articleModal').classList.add('hidden');
-        }
-
-        document.getElementById('articleModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        document.getElementById('new').add
-        document.querySelector('#articleModal > div').addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    </script>
+    <script src="../Js/Script.js"></script>
 </body>
 
 </html>

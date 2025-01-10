@@ -1,24 +1,53 @@
-function showArticle(article) {
-    document.getElementById('modalTitle').textContent = article.title;
-    document.getElementById('modalAuthor').textContent = article.author;
-    document.getElementById('modalCategory').textContent = article.category;
-    document.getElementById('modalDate').textContent = article.date;
-    document.getElementById('modalDescription').textContent = article.body;
-    document.getElementById('articleModal').classList.remove('hidden');
-}
+// // Gestion de la soumission du formulaire de catégorie
+// document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+//     e.preventDefault();
 
-function closeModal() {
-    document.getElementById('articleModal').classList.add('hidden');
-}
+//     const formData = new FormData(e.target);
+//     const response = await fetch('', {
+//         method: 'POST',
+//         body: formData,
+//     });
 
-// Fermer la modale si on clique en dehors
-document.getElementById('articleModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeModal();
-    }
+//     const result = await response.json();
+//     if (result.success) {
+//         alert('Category added successfully!');
+//         // closeModal('categoryModal');
+//     } else {
+//         alert('Failed to add category: ' + result.message);
+//     }
+// });
+
+// // Gestion de la soumission du formulaire d'article
+// document.getElementById('addArticleForm').addEventListener('submit', async (e) => {
+//     e.preventDefault();
+
+//     const formData = new FormData(e.target);
+//     const response = await fetch('', {
+//         method: 'POST',
+//         body: formData,
+//     });
+
+//     const result = await response.json();
+//     if (result.success) {
+//         alert('Article added successfully!');
+//         // closeModal('articleModal');
+//     } else {
+//         alert('Failed to add article: ' + result.message);
+//     }
+// });
+
+document.getElementById('New_article').addEventListener('click', () => {
+    openModal('articleModal');
 });
 
-// Empêcher la fermeture quand on clique sur le contenu de la modale
-document.querySelector('#articleModal > div').addEventListener('click', function(e) {
-    e.stopPropagation();
+document.getElementById('New_category').addEventListener('click', () => {
+    openModal('categoryModal');
 });
+
+function openModal(id){
+    document.getElementById(id).classList.remove('hidden')
+}
+
+function closeModal(id){
+    document.getElementById(id).classList.add('hidden')
+}
