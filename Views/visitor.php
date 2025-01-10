@@ -2,16 +2,13 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
 $msg = null;
 
-
-
 if (!isset($_SESSION['email'])) {
     header('Location: login.php');
     exit();
+} else {
+    $articles = get_articles($_SESSION['email']);
 }
-if(strtolower($_SESSION['role']) == 'visitor') {
-    header('Location:'.$_SESSION['role'] .'.php');
-    // exit;
-}
+
 
 if(isset($_POST['upgrade'])){
     upgrade_role($_SESSION['email']);
@@ -74,8 +71,8 @@ $articles = get_articles();
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">
-                        <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
                         <button name="upgrade" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Upgrade</button>
+                        <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
                     </div>
                 </form>
             </nav>
@@ -98,8 +95,8 @@ $articles = get_articles();
                                     <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="<?= 'data:image/jpeg;base64,' .base64_encode($article['images']) ?>" alt="Photo de l'auteur">
                                     <div>
                                         <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
-                                        <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4>
-                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat_id']) ?></span><span class="text-sm text-[#ECD9B6]"> <?= htmlspecialchars($article['created_at']) ?></span>
+                                        <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4><span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat']) ?></span>
+                                        <span class="text-sm text-[#ECD9B6]"> <?= htmlspecialchars($article['created_at']) ?></span>
                                     </div>
                                 </div>
                                 <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
@@ -109,7 +106,7 @@ $articles = get_articles();
                                     onclick="showArticle(<?= json_encode([
                                                                 'title' => $article['title'],
                                                                 'author' => explode('@', $article['email'])[0],
-                                                                'category' => $article['cat_id'],
+                                                                'category' => $article['cat'],
                                                                 'date' => $date,
                                                                 'body' => $article['art_body']
                                                             ]) ?>)"

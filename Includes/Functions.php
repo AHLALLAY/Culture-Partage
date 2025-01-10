@@ -81,8 +81,6 @@ function login($email, $pwd){
         $res = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($res) {
-
-            // Vérifier le mot de passe
             if (password_verify($pwd, $res['pwd_hashed'])) {
                 $_SESSION['email'] = $res['email'];
                 $_SESSION['role'] = $res['roles'];
@@ -112,7 +110,7 @@ function logout(){
 }
 
 function upgrade_role($email){
-    global $con, $msg;
+    global $con;
 
     try {
         if (!empty($email)) {
@@ -141,14 +139,18 @@ function get_articles($email = null){
     $articles = [];
     try {
         if ($email) {
-            $stmt = $con->prepare("SELECT articles.*, users.email, users.images, category.cat FROM articles 
-                                   LEFT JOIN users ON articles.author_id = users.users_id
-                                   LEFT JOIN category ON articles.cat_id = category.cat_id
-                                   WHERE users.email = :email ORDER BY articles.created_at DESC");
+            $stmt = $con->prepare("SELECT articles.title, articles.art_body, articles.created_at, users.email, users.images, category.cat 
+                                    FROM articles 
+                                    LEFT JOIN users ON articles.author_id = users.users_id
+                                    LEFT JOIN category ON articles.cat_id = category.cat_id
+                                    WHERE users.email = :email ORDER BY articles.created_at DESC");
             $stmt->bindParam(':email', $email);
         } else {
-            $stmt = $con->prepare("SELECT articles.*, users.email, users.images FROM articles 
-                                   JOIN users ON articles.author_id = users.users_id ORDER BY articles.created_at DESC");
+            $stmt = $con->prepare("SELECT articles.title, articles.art_body, articles.created_at, users.email, users.images, category.cat
+                                    FROM articles 
+                                    LEFT JOIN users ON articles.author_id = users.users_id
+                                    LEFT JOIN category ON articles.cat_id = category.cat_id
+                                    ORDER BY articles.created_at DESC");
         }
 
         $stmt->execute();

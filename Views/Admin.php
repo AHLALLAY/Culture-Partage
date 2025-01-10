@@ -1,7 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Includes/Functions.php';
 
-// session_start();
 $users = get_users();
 $category = get_category();
 
@@ -157,10 +156,10 @@ if (isset($_POST['Add_article'])) {
                 </div>
                 <form method="post">
                     <div class="space-y-2">
-                        <button type="button" name="display_users" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Display users</button>
+                        <button type="submit" name="display_users" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Display users</button>
                         <button type="button" id="New_article" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Add article</button>
                         <button type="button" id="New_category" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-52">Add Category</button>
-                        <button type="button" name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-52">Logout</button>
+                        <button type="submit" name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-52">Logout</button>
                     </div>
                 </form>
             </nav>

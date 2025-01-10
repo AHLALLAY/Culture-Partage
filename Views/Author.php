@@ -45,7 +45,7 @@ if (isset($_POST['logout'])) {
                         </div>
                     </div>
                 </div>
-                <button onclick="closeModal()" class="text-[#ECD9B6] hover:text-[#FAF9FA] text-xl font-bold">&times;</button> <!-- fermer -->
+                <button onclick="closeModal('articleModal')" class="text-[#ECD9B6] hover:text-[#FAF9FA] text-xl font-bold">&times;</button> <!-- fermer -->
             </div>
             <div class="border-t border-[#4C7DA4] py-4">
                 <div class="prose prose-invert">
@@ -70,10 +70,10 @@ if (isset($_POST['logout'])) {
                 </div>
                 <form method="post" class="select-none">
                     <div class="space-y-2">
-                        <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
                         <button name="all_articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Display All</button>
                         <button name="my_articles" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">My Article</button>
                         <button name="new" id="new" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4] w-full hover:bg-[#10ADE9] transition-colors">Add Article</button>
+                        <button name="logout" class="text-[#FAF9FA] rounded-lg px-4 py-2 bg-[#4C7DA4]/60 w-full hover:bg-[#10ADE9] transition-colors">Logout</button>
                     </div>
                 </form>
             </nav>
@@ -93,11 +93,11 @@ if (isset($_POST['logout'])) {
                         <article class="select-none bg-[#191A1F] rounded-lg overflow-hidden shadow-lg border border-[#4C7DA4] hover:border-[#FAF9FA] transition-all duration-300 transform hover:-translate-y-1">
                             <div class="p-6">
                                 <div class="flex items-center space-x-4 mb-4">
-                                    <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="/Asset/default-avatar.jpg" alt="Photo de l'auteur">
+                                    <img class="w-16 h-16 rounded-full object-cover border-2 border-[#ECD9B6]" src="data:image/*;base64,<?= base64_encode($user['images']) ?>" alt="<?= htmlspecialchars(explode('@', $article['email'])[0]) ?>'s profile">
                                     <div>
                                         <h3 class="text-[#FAF9FA] font-bold text-lg"><?= htmlspecialchars($article['title']) ?></h3>
                                         <h4 class="text-[#ECD9B6]"><?= htmlspecialchars(explode('@', $article['email'])[0]) ?></h4>
-                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat_id']) ?></span>
+                                        <span class="text-sm text-[#ECD9B6]"><?= htmlspecialchars($article['cat']) ?></span>
                                     </div>
                                 </div>
                                 <p class="text-[#ECD9B6] mb-4 border-l-2 border-[#4C7DA4] pl-4">
@@ -107,7 +107,7 @@ if (isset($_POST['logout'])) {
                                     onclick="showArticle(<?= json_encode([
                                                                 'title' => $article['title'],
                                                                 'author' => explode('@', $article['email'])[0],
-                                                                'category' => $article['cat_id'],
+                                                                'category' => $article['cat'],
                                                                 'date' => $date,
                                                                 'body' => $article['art_body']
                                                             ]) ?>)"
@@ -131,7 +131,7 @@ if (isset($_POST['logout'])) {
     <?php endif; ?>
 
     <!-- Modal d'ajoute-->
-<div id="addArticle" class="select-none fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+    <div id="addArticle" class="select-none fixed inset-0 bg-[#1F2821]/90 z-50 hidden flex items-center justify-center backdrop-blur-sm">
         <div class="bg-[#191A1F] w-full max-w-2xl rounded-lg shadow-2xl p-6 mx-4 max-h-[90vh] overflow-y-auto border border-[#4C7DA4]">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center space-x-4">
