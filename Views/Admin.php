@@ -36,7 +36,7 @@ if (isset($_POST['Add_article'])) {
     if (!empty($_POST['articleTitle']) && !empty($_POST['articleDescription']) && !empty($_POST['articleCategory'])) {
         $result = new_article($_POST['articleTitle'], $_POST['articleDescription'], $_POST['articleCategory']);
         if ($result) {
-            // echo"<script>alert('Category added with success')</script>";  
+            echo "<script>alert('Article added with success')</script>";
         }
     } else {
         echo "<script>alert('Remplir le champ de categorie')</script>";
