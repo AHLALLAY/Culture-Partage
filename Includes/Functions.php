@@ -20,41 +20,47 @@ function is_exist($email){
     }
 }
 
-function register($f_name, $l_name, $pic, $email, $pwd, $roles, $created_at, $is_suspend = 0){
+function register($f_name, $l_name, $pic, $email, $pwd, $roles, $created_at, $is_suspend = 0) {
     global $con, $msg;
 
     try {
         if (is_exist($email)) {
-            return "<script>alert('Email already exists');</script>";
+            $msg = "Cet e-mail est déjà utilisé.";
+            return false;
         }
-        $stmt = $con->prepare("INSERT INTO users (f_name, l_name, pic, email, pwd_hashed, roles, created_at, is_suspend) 
-                               VALUES (:f_name, :l_name, :pic, :email, :pwd_hashed, :roles, :created_at, : is_suspend)");
 
+        // Préparer la requête SQL
+        $stmt = $con->prepare("INSERT INTO users (f_name, l_name, images, email, pwd_hashed, roles, created_at, is_suspend) 
+                               VALUES (:f_name, :l_name, :images, :email, :pwd_hashed, :roles, :created_at, :is_suspend)");
 
+        // Lire le fichier image en binaire
+        $imageData = file_get_contents($pic);
+
+        // Exécuter la requête avec les données
         $stmt->execute([
-            ':f_name' => $f_name,
-            ':l_name' => $l_name,
-            ':pic' => $pic,
-            ':email' => $email,
+            ':f_name' => htmlspecialchars($f_name),
+            ':l_name' => htmlspecialchars($l_name),
+            ':images' => $imageData, // Insérer l'image en binaire
+            ':email' => htmlspecialchars($email),
             ':pwd_hashed' => password_hash($pwd, PASSWORD_DEFAULT),
-            ':roles' => $roles,
-            ':created_at' => $created_at,
+            ':roles' => htmlspecialchars($roles),
+            ':created_at' => htmlspecialchars($created_at),
             ':is_suspend' => $is_suspend
         ]);
 
         if ($con->lastInsertId()) {
-            header('location: Login.php');
-            exit;
+            return true;
         } else {
-            $msg = "Registration failed";
-            return "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+            $msg = "Erreur lors de l'inscription.";
+            return false;
         }
     } catch (PDOException $e) {
-        $msg = "Error: " . $e->getMessage();
-        return "<script>alert('" . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . "');</script>";
+        // Afficher l'erreur SQL pour déboguer
+        error_log("Erreur SQL : " . $e->getMessage());
+        $msg = "Erreur : " . $e->getMessage();
+        return false;
     }
 }
-
 function is_suspend($email){
     global $con;
     try {
